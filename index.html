@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Love You</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+    --wine: #521d27;
+    --wine-dark: #321219;
+    --beige: #eadcc4;
+    --paper: #f5eddf;
+    --ink: #492c2b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--wine-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'DM Mono', monospace;
+    color: var(--beige);
+}
+
+.background {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at center,
+        #672b35 0%,
+        #461923 55%,
+        #251015 100%);
+    z-index: -2;
+}
+
+.grain {
+    position: fixed;
+    inset: 0;
+    opacity: .08;
+    pointer-events: none;
+    z-index: 10;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E");
+}
+
+.container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+}
+
+.heading {
+    margin-bottom: 55px;
+    animation: fadeIn 1.5s ease;
+}
+
+.heading p {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #c8a99a;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.heading h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 48px);
+    font-weight: 400;
+    color: var(--beige);
+}
+
+/* Envelope */
+
+.envelope-wrapper {
+    position: relative;
+    width: 300px;
+    height: 195px;
+    perspective: 1000px;
+    cursor: pointer;
+    transition: transform .5s ease;
+}
+
+.envelope-wrapper:hover:not(.opened) {
+    transform: translateY(-8px);
+}
+
+.envelope {
+    position: absolute;
+    inset: 0;
+    background: #d7c4a5;
+    border-radius: 4px;
+    box-shadow: 0 20px 60px #16090b80;
+}
+
+.envelope-front {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background: #d7c4a5;
+    clip-path: polygon(0 0, 50% 57%, 100% 0,
+                       100% 100%, 0 100%);
+    border-radius: 4px;
+}
+
+.envelope-side {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: #cbb590;
+    clip-path: polygon(0 0, 50% 55%, 0 100%);
+}
+
+.envelope-side.right {
+    clip-path: polygon(100% 0, 50% 55%, 100% 100%);
+}
+
+/* Flap */
+
+.flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #eadcc4;
+    clip-path: polygon(0 0, 100% 0, 50% 58%);
+    transform-origin: top;
+    transition: transform .8s ease;
+    z-index: 5;
+    filter: drop-shadow(0 3px 2px #00000020);
+}
+
+/* Wax stamp */
+
+.seal {
+    position: absolute;
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    background: #762e39;
+    border: 2px solid #9a5358;
+    z-index: 6;
+    left: 50%;
+    top: 57%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e9cdb1;
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    box-shadow: 0 3px 8px #00000030;
+    transition: opacity .4s ease;
+}
+
+/* Letter inside envelope */
+
+.letter {
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    transform: translateX(-50%);
+    width: 270px;
+    height: 175px;
+    background: var(--paper);
+    z-index: 2;
+    transition: transform 1s ease, height 1s ease;
+    box-shadow: 0 0 20px #00000020;
+}
+
+/* Opening animation */
+
+.envelope-wrapper.opened .flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+}
+
+.envelope-wrapper.opened .seal {
+    opacity: 0;
+}
+
+.envelope-wrapper.opened .letter {
+    transform: translate(-50%, -110px);
+    transition-delay: .5s;
+}
+
+/* Instruction */
+
+.instruction {
+    margin-top: 65px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #c8a99a;
+    animation: pulse 2s infinite;
+}
+
+.envelope-wrapper.opened + .instruction {
+    opacity: 0;
+}
+
+/* Letter overlay */
+
+.letter-screen {
+    position: fixed;
+    inset: 0;
+    background: #261115ee;
+    backdrop-filter: blur(8px);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .8s ease, visibility .8s;
+}
+
+.letter-screen.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Paper */
+
+.paper {
+    position: relative;
+    width: min(570px, 100%);
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 55px 55px 45px;
+    box-shadow: 0 25px 80px #00000050;
+    transform: translateY(35px);
+    transition: transform .8s ease;
+    border: none;
+}
+
+.letter-screen.visible .paper {
+    transform: translateY(0);
+}
+
+.paper-header {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #947568;
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.paper h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.message {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    line-height: 1.9;
+}
+
+.message p {
+    margin-bottom: 25px;
+}
+
+.message .closing {
+    margin-top: 35px;
+    font-style: italic;
+    color: #82504a;
+}
+
+.paper-footer {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #a18a73;
+    margin-top: 35px;
+}
+
+/* Close button */
+
+.close-btn {
+    display: block;
+    margin: 30px auto 0;
+    background: transparent;
+    border: 1px solid #a78b76;
+    padding: 10px 25px;
+    color: #79554c;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.close-btn:hover {
+    background: var(--wine);
+    color: var(--beige);
+}
+
+/* Animations */
+
+@keyframes pulse {
+    0%, 100% { opacity: .5; }
+    50% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 500px) {
+    .envelope-wrapper {
+        transform: scale(.85);
+    }
+
+    .envelope-wrapper:hover:not(.opened) {
+        transform: scale(.85) translateY(-8px);
+    }
+
+    .paper {
+        padding: 45px 30px;
+    }
+
+    .message {
+        font-size: 15px;
+    }
+
+    .paper h2 {
+        font-size: 27px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="background"></div>
+<div class="grain"></div>
+
+<main class="container">
+
+    <header class="heading">
+        <p>A little something for you</p>
+        <h1>I love you.</h1>
+    </header>
+
+    <div class="envelope-wrapper" id="envelope">
+
+        <div class="envelope">
+
+            <div class="letter"></div>
+
+            <div class="envelope-side"></div>
+            <div class="envelope-side right"></div>
+
+            <div class="envelope-front"></div>
+
+            <div class="flap"></div>
+
+            <div class="seal">P</div>
+
+        </div>
+
+    </div>
+
+    <p class="instruction" id="instruction">
+        CLICK TO OPEN
+    </p>
+
+</main>
+
+<!-- Personal letter -->
+
+<div class="letter-screen" id="letterScreen">
+
+    <article class="paper">
+
+        <div class="paper-header">
+           this is my love so pls read it carefully
+        </div>
+
+        <h2>Dear Phong,</h2>
+
+        <div class="message">
+
+            <p>
+                I don't really know why i came up with this idea,
+                but I know that you deserve the best and
+                I would love to be the one to give it to you.
+            </p>
+
+            <p>
+                Thank you for being yourself, for being the very first
+                person that I can truly be myself with,
+                and for sprakling the first beautiful memories of my uni life.
+            </p>
+
+            <p>
+                I hope life treats you kindly.
+                And whenever things get difficult,
+                remember that there are people (just like me)
+                who'd love to have you in their lives.
+            </p>
+
+            <p>
+                This little letter is just a small appreciation
+                for you in the International Men's Day.
+            </p>
+
+            <p class="closing">
+                I love you,<br>
+                Phuong Giang.
+            </p>
+
+        </div>
+
+        <div class="paper-footer">
+            MADE WITH LOVE
+        </div>
+
+        <button class="close-btn" id="closeLetter">
+            CLOSE LETTER
+        </button>
+
+    </article>
+
+</div>
+
+<script>
+
+const envelope = document.getElementById('envelope');
+const letterScreen = document.getElementById('letterScreen');
+const closeLetter = document.getElementById('closeLetter');
+const instruction = document.getElementById('instruction');
+
+let opened = false;
+
+// Open envelope
+
+envelope.addEventListener('click', () => {
+
+    if (opened) return;
+
+    opened = true;
+
+    envelope.classList.add('opened');
+
+    instruction.textContent = 'A LITTLE SURPRISE FOR YOU';
+
+    setTimeout(() => {
+        letterScreen.classList.add('visible');
+    }, 1200);
+
+});
+
+// Close letter
+
+closeLetter.addEventListener('click', () => {
+
+    letterScreen.classList.remove('visible');
+
+    setTimeout(() => {
+
+        envelope.classList.remove('opened');
+        opened = false;
+
+        instruction.textContent = 'CLICK TO OPEN';
+
+    }, 800);
+
+});
+
+</script>
+
+</body>
+</html>
